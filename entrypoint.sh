@@ -2,13 +2,13 @@
 set -e
 
 if [ -n "$DATABASE_URL" ] && [ -f "/app/migrations/000_one_shot_schema.sql" ]; then
-    echo "Mike: Waiting for auth schema (GoTrue) to be ready..."
-    for i in $(seq 1 30); do
-        if psql "$DATABASE_URL" -tAc "SELECT EXISTS (SELECT FROM information_schema.schemata WHERE schema_name = 'auth')" 2>/dev/null | grep -q "t"; then
-            echo "Mike: Auth schema found."
+    echo "Mike: Waiting for auth.users table (GoTrue) to be ready..."
+    for i in $(seq 1 60); do
+        if psql "$DATABASE_URL" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'auth' AND table_name = 'users')" 2>/dev/null | grep -q "t"; then
+            echo "Mike: auth.users table found."
             break
         fi
-        echo "Mike: Auth schema not ready, retrying in 5s ($i/30)..."
+        echo "Mike: auth.users not ready, retrying in 5s ($i/60)..."
         sleep 5
     done
 
