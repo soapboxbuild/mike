@@ -19,7 +19,8 @@ if [ -n "$DATABASE_URL" ] && [ -f "/app/migrations/000_one_shot_schema.sql" ]; t
     if [ "$TABLE_EXISTS" = "f" ] || [ "$TABLE_EXISTS" = "false" ]; then
         echo "Mike: Running application schema migration..."
         psql "$DATABASE_URL" -f /app/migrations/000_one_shot_schema.sql
-        echo "Mike: Schema migration complete."
+        psql "$DATABASE_URL" -c "NOTIFY pgrst, 'reload schema'" 2>/dev/null || true
+        echo "Mike: Schema migration complete, PostgREST notified."
     else
         echo "Mike: App schema already initialized."
     fi
