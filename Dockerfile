@@ -10,6 +10,10 @@ RUN git clone --depth 1 --branch ${MIKE_GIT_REF} https://github.com/willchen96/m
 WORKDIR /app
 RUN cp -r /tmp/mike/backend/. . && rm -rf /tmp/mike
 
+# Default to Claude Opus (Anthropic) instead of Gemini
+RUN sed -i 's/"gemini-3-flash-preview"/"claude-opus-4-7"/g' src/lib/llm/models.ts \
+ && sed -i 's/"gemini-3.1-flash-lite-preview"/"claude-haiku-4-5"/g' src/lib/llm/models.ts
+
 RUN npm install
 RUN npm run build
 
