@@ -15,7 +15,7 @@ RUN sed -i 's/"gemini-3-flash-preview"/"claude-opus-4-7"/g' src/lib/llm/models.t
  && sed -i 's/"gemini-3.1-flash-lite-preview"/"claude-haiku-4-5"/g' src/lib/llm/models.ts \
  && sed -i 's/status: "processing"/filename: filename, status: "processing"/g' src/routes/documents.ts \
  && sed -i 's/status: "processing"/filename: filename, status: "processing"/g' src/routes/projects.ts \
- && sed -i 's/status: "ready",$/filename: filename, status: "ready",/g' src/lib/chatTools.ts
+ && python3 /opt/local-adapters/patch_mike.py
 
 RUN npm install
 RUN npm run build
