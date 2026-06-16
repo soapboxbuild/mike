@@ -98,5 +98,30 @@ p = p.replace(
   }`
 );
 
+// In POST (create) handler: send invites to shared_with on new project
+p = p.replace(
+  `  if (error) return void res.status(500).json({ detail: error.message });
+  res.status(201).json({ ...data, documents: [] });`,
+  `  if (error) return void res.status(500).json({ detail: error.message });
+
+  // Send invite emails to initial shared members
+  if (cleanedSharedWith.length > 0) {
+    const db2 = createServerSupabase();
+    const { data: profile } = await db2
+      .from("user_profiles")
+      .select("display_name")
+      .eq("user_id", userId)
+      .single();
+    sendInviteEmails(
+      userEmail ?? "",
+      profile?.display_name ?? userEmail ?? "",
+      data.name ?? "a project",
+      cleanedSharedWith,
+    ).catch(() => {/* fire-and-forget */});
+  }
+
+  res.status(201).json({ ...data, documents: [] });`
+);
+
 writeFileSync('src/routes/projects.ts', p);
-console.log('patched projects.ts with Resend invite emails');
+console.log('patched projects.ts with Resend invite emails (PATCH + POST)');
