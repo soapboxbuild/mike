@@ -26,7 +26,7 @@ async function sendInviteEmails(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Mike Legal <mike@soapbox.build>",
+          from: "Mike Legal <mike@agents.soapbox.build>",
           to,
           subject: \`\${inviterName || inviterEmail} shared a project with you on Mike\`,
           html: \`<p>Hi,</p>
