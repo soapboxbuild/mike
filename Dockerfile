@@ -4,11 +4,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-ARG MIKE_GIT_REF=main
+# Pinned to commit SHA for supply-chain safety (willchen96/mike@main as of 2026-06-18).
+# To update: verify the new SHA, update this line, and re-run the build.
+ARG MIKE_GIT_REF=457d4a18a4a0a8b60f1a8bb03d33770b6cf9b90d
 RUN git clone --depth 1 --branch ${MIKE_GIT_REF} https://github.com/willchen96/mike.git /tmp/mike
 
 WORKDIR /app
 RUN cp -r /tmp/mike/backend/. . && rm -rf /tmp/mike
+
+# Install deps before copying patches so patch changes don't bust the npm cache layer
+RUN npm install
 
 # Default to Claude Opus (Anthropic) instead of Gemini
 COPY patch_mike.mjs /tmp/patch_mike.mjs
@@ -18,7 +23,6 @@ RUN sed -i 's/"gemini-3-flash-preview"/"claude-opus-4-8"/g' src/lib/llm/models.t
  && node /tmp/patch_mike.mjs \
  && node /tmp/patch_resend.mjs
 
-RUN npm install
 RUN npm run build
 
 FROM node:22-bookworm-slim
